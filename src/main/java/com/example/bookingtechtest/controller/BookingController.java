@@ -3,17 +3,19 @@ package com.example.bookingtechtest.controller;
 import com.example.bookingtechtest.dto.BookingDTO;
 import com.example.bookingtechtest.entity.Booking;
 import com.example.bookingtechtest.request.CreateBookingRequest;
+import com.example.bookingtechtest.request.UpdateBookingRequest;
 import com.example.bookingtechtest.response.CreateBookingResponse;
 import com.example.bookingtechtest.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+
 import java.util.UUID;
 
 @Tag(name = "Bookings", description = "The bookings API")
@@ -49,7 +51,7 @@ public class BookingController {
             @ApiResponse(responseCode = "404", description = "resource not found request")
     })
     @PutMapping("/update-booking/{id}")
-    public ResponseEntity<BookingDTO> updateBooking(@PathVariable UUID id, @Valid @RequestBody Booking booking) {
+    public ResponseEntity<BookingDTO> updateBooking(@PathVariable UUID id, @Valid @RequestBody UpdateBookingRequest booking) {
         BookingDTO updatedBooking = bookingService.updateBooking(id, booking);
         return ResponseEntity.ok(updatedBooking);
     }

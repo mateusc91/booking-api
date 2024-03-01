@@ -1,10 +1,9 @@
 package com.example.bookingtechtest.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,10 +21,8 @@ public class Block {
     @Column(name = "ID", updatable = false, nullable = false, length = 16)
     private UUID id;
 
-    @NotNull
     private LocalDate startDate;
 
-    @NotNull
     private LocalDate endDate;
 
     private LocalDateTime created_at ;

@@ -1,19 +1,14 @@
 package com.example.bookingtechtest.request;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
-public class CreateBookingRequest {
+public class UpdateBookingRequest {
 
-    @NotNull
-    private UUID propertyId;
     @NotNull
     private LocalDate startDate;
     @NotNull

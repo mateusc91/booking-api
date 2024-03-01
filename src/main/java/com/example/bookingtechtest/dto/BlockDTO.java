@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class BlockDTO {
     private UUID id;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String startDate;
+    private String endDate;
     private PropertyDTO property;
 }

@@ -15,8 +15,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreateBookingResponse {
     private UUID id;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String startDate;
+    private String endDate;
     private String status;
     private String guestName;
     private String guestLast4Ssn;

@@ -9,6 +9,7 @@ import com.example.bookingtechtest.exception.ResourceNotFoundException;
 import com.example.bookingtechtest.repository.BookingRepository;
 import com.example.bookingtechtest.repository.PropertyRepository;
 import com.example.bookingtechtest.request.CreateBookingRequest;
+import com.example.bookingtechtest.request.UpdateBookingRequest;
 import com.example.bookingtechtest.response.CreateBookingResponse;
 import com.example.bookingtechtest.validator.PropertyAvailabilityValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,7 @@ public class BookingService {
 //                .orElseThrow(() -> new ResourceNotFoundException("Guest not found with id: " + request.getGuestId()));
 
         Property property = propertyRepository.findById(request.getPropertyId())
-                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id: " + request.getGuestId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id: " + request.getPropertyId()));
 
         // Create a new booking
         Booking booking = new Booking();
@@ -63,7 +64,7 @@ public class BookingService {
         return modelMapper.map(booking,CreateBookingResponse.class);
     }
 
-    public BookingDTO updateBooking(UUID id, Booking updatedBooking) {
+    public BookingDTO updateBooking(UUID id, UpdateBookingRequest updatedBooking) {
         log.info("Attempting to update booking : {}", updatedBooking);
         // Logic to check if the booking with the given id exists
         BookingDTO existingBooking = getBooking(id);
@@ -125,7 +126,7 @@ public class BookingService {
             throw new IllegalArgumentException("The booking needs to have status canceled to be rebooked.");
         }
 
-        Booking newBooking = new Booking();
+        UpdateBookingRequest newBooking = new UpdateBookingRequest();
         newBooking.setEndDate(existingBookingToBeUpdated.getEndDate());
         newBooking.setStartDate(existingBookingToBeUpdated.getStartDate());
         newBooking.setGuestName(existingBookingToBeUpdated.getGuestName());

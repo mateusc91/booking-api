@@ -1,10 +1,11 @@
 package com.example.bookingtechtest.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.UUID;
 
