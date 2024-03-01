@@ -7,11 +7,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.UUID;
 
 @Tag(name = "Blocks", description = "The blocks API")
@@ -47,7 +47,7 @@ public class BlockController {
             @ApiResponse(responseCode = "404", description = "resource not found request")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<BlockDTO> updateBlock(@PathVariable UUID id, @Valid @RequestBody Block block) {
+    public ResponseEntity<BlockDTO> updateBlock(@PathVariable UUID id,@Valid @RequestBody Block block) {
         BlockDTO updatedBlock = blockService.updateBlock(id, block);
         return ResponseEntity.status(HttpStatus.OK).body(updatedBlock);
     }
