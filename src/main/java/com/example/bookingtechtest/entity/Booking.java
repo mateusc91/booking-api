@@ -1,13 +1,15 @@
 package com.example.bookingtechtest.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Entity
 @Getter
@@ -15,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Audited
 @Table(name = "TB_BOOKINGS")
 public class Booking {
     @Id
@@ -36,6 +39,7 @@ public class Booking {
 
     private String guestLast4Ssn;
 
+    @Audited(targetAuditMode = NOT_AUDITED)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "property_id")
     private Property property;

@@ -1,4 +1,4 @@
-package com.example.bookingtechtest;
+package com.example.bookingtechtest.service;
 
 import com.example.bookingtechtest.controller.BlockController;
 import com.example.bookingtechtest.dto.BlockDTO;
@@ -31,6 +31,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -40,9 +41,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class BlockServiceTest {
-    private MockMvc mockMvc;
+
     @Mock
-    private ModelMapper mapper;
+    private ModelMapper mapper ;
 
     @Mock
     private BlockService blockService;
@@ -51,14 +52,11 @@ class BlockServiceTest {
     private BlockRepository blockRepository;
 
     @Mock
-    private BlockController blockController;
-
-    @Mock
     private PropertyAvailabilityValidator propertyAvailabilityValidator;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(blockController).build();
+        blockService = new BlockService(blockRepository, mapper, propertyAvailabilityValidator);
     }
 
     @Test
@@ -72,8 +70,8 @@ class BlockServiceTest {
         UUID blockId = UUID.randomUUID();
         BlockDTO blockDTO = BlockDTO.builder()
                 .id(blockId)
-                .startDate(startDateParsed)
-                .endDate(endDateParsed)
+                .startDate(startDate)
+                .endDate(endDate)
                 .build();
         Property property = new Property();
         property.setOwnerName("John Kennery");
@@ -84,15 +82,15 @@ class BlockServiceTest {
         block.setStartDate(startDateParsed);
         block.setEndDate(endDateParsed);
         block.setProperty(property);
-        given(mapper.map(block, BlockDTO.class)).willReturn(blockDTO);
+        when(mapper.map(block, BlockDTO.class)).thenReturn(blockDTO);
 
         var response = blockService.createBlock(block);
         verify(blockRepository, times(1)).save(block);
         verify(mapper, times(1)).map(block, BlockDTO.class);
 
         assertEquals(blockId,response.getId());
-        assertEquals(startDateParsed,response.getStartDate());
-        assertEquals(endDateParsed,response.getEndDate());
+        assertEquals(startDate,response.getStartDate());
+        assertEquals(endDate,response.getEndDate());
     }
 
     @Test
@@ -114,27 +112,12 @@ class BlockServiceTest {
         block.setEndDate(endDateParsed);
         block.setProperty(property);
 
-        // Mock service method
-        doThrow(new OverlapedBookingException("Validation failed")).when(blockService).createBlock(any(Block.class));
-    }
-
-    @Test
-    void testCreateBlock_ValidationFailure() throws Exception {
-        // Prepare data
-        Block block = new Block();
-
-        // Mock service method to throw OverlapedBookingException
-        doThrow(new OverlapedBookingException("This property is already blocked for booking on the dates selected."))
-                .when(blockService).createBlock(any(Block.class));
+        // Mock behavior of blockRepository.save(block) to throw OverlapedBookingException
+        doThrow(new OverlapedBookingException("This property is already blocked for booking on the dates selected.")).when(blockRepository).save(block);
 
         // Perform request and verify
-        this.mockMvc.perform(post("/blocks")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(block)))
-                .andExpect(status().isBadRequest());
+        assertThrows(OverlapedBookingException.class, () -> blockService.createBlock(block));
     }
-
-
 
 }
 

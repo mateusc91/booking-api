@@ -21,7 +21,6 @@ public class BookingDTO {
     private String status;
     private LocalDateTime created_at;
     private LocalDateTime last_updated_at;
-    //private GuestDTO guest;
     private String guestName;
     private String guestLast4Ssn;
     private PropertyDTO property;
