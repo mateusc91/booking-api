@@ -35,4 +35,6 @@ For this project, we are using h2 in-memory database, if you want to access the 
 ```shell
 http://localhost:8080/h2-console/
 ```
+## JSON Collection for testing 
+[colletions-for-testing.json](https://github.com/mateusc91/booking-api/files/14475819/colletions-for-testing.json)
 
