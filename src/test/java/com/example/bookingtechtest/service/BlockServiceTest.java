@@ -1,43 +1,27 @@
 package com.example.bookingtechtest.service;
 
-import com.example.bookingtechtest.controller.BlockController;
 import com.example.bookingtechtest.dto.BlockDTO;
 import com.example.bookingtechtest.entity.Block;
 import com.example.bookingtechtest.entity.Property;
 import com.example.bookingtechtest.exception.OverlapedBookingException;
 import com.example.bookingtechtest.repository.BlockRepository;
-import com.example.bookingtechtest.service.BlockService;
 import com.example.bookingtechtest.validator.PropertyAvailabilityValidator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class BlockServiceTest {
@@ -117,6 +101,53 @@ class BlockServiceTest {
 
         // Perform request and verify
         assertThrows(OverlapedBookingException.class, () -> blockService.createBlock(block));
+    }
+
+    @Test
+    @DisplayName("Updating a block successfully")
+    void given_ValidRequest_then_updateBlock() {
+        // Prepare data
+        UUID blockId = UUID.fromString("3b3e5980-b136-42b2-ab00-024948232e96");
+        String startDate = "2024-02-01";
+        String endDate = "2024-02-05";
+        LocalDate startDateParsed = LocalDate.parse(startDate);
+        LocalDate endDateParsed = LocalDate.parse(endDate);
+
+        // Create an updated block with the same ID as the existing block
+        Block updatedBlock = new Block();
+        updatedBlock.setId(blockId);
+        updatedBlock.setStartDate(startDateParsed);
+        updatedBlock.setEndDate(endDateParsed);
+
+        // Mock the existing block returned by the repository
+        Block existingBlock = new Block();
+        existingBlock.setId(blockId);
+        existingBlock.setStartDate(startDateParsed);
+        existingBlock.setEndDate(LocalDate.parse("2024-02-03")); // Assuming an initial end date
+        when(blockRepository.findById(blockId)).thenReturn(Optional.of(existingBlock));
+
+        // Call the service method
+        blockService.updateBlock(blockId, updatedBlock);
+
+        // Verify that the repository's save method is called with the updated block
+        verify(blockRepository, times(1)).findById(updatedBlock.getId());
+        verify(blockRepository, times(1)).save(existingBlock); // Verify save is called with existingBlock
+    }
+
+    @Test
+    @DisplayName("Deleting a block successfully")
+    void given_ValidBlockId_then_deleteBlock() throws Exception {
+        // Prepare data
+        UUID blockId = UUID.randomUUID();
+
+        // Mock repository method
+        when(blockRepository.findById(blockId)).thenReturn(Optional.of(new Block()));
+
+        // Perform the delete
+        blockService.deleteBlock(blockId);
+
+        // Verify that the repository's delete method is called with the correct block
+        verify(blockRepository, times(1)).delete(any(Block.class));
     }
 
 }

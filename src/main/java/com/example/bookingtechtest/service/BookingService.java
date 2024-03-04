@@ -37,11 +37,25 @@ public class BookingService {
         this.propertyRepository = propertyRepository;
     }
 
+    public BookingDTO getBookingById(UUID id) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + id));
+        BookingDTO bookingDTO = modelMapper.map(booking, BookingDTO.class);
+        bookingDTO.setGuestName(booking.getGuestName());
+        bookingDTO.setGuestLast4Ssn(booking.getGuestLast4Ssn());
+        bookingDTO.setProperty(modelMapper.map(booking.getProperty(), PropertyDTO.class));
+
+        return bookingDTO;
+    }
+
     public CreateBookingResponse createBooking(CreateBookingRequest request) {
         log.info("Attempt to create booking: {}", request);
 
         Property property = propertyRepository.findById(request.getPropertyId())
-                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id: " + request.getPropertyId()));
+                .orElseThrow(() -> {
+                    log.error("An error occurred. Booking can't be created because the property was not found with id: {}", request.getPropertyId());
+                    return new ResourceNotFoundException("Property not found with id: " + request.getPropertyId());
+                });
 
         Booking booking = new Booking();
         booking.setGuestName(request.getGuestName());
@@ -61,8 +75,8 @@ public class BookingService {
 
     public BookingDTO updateBooking(UUID id, UpdateBookingRequest updatedBooking) {
         log.info("Attempting to update booking : {}", updatedBooking);
-        BookingDTO existingBooking = getBooking(id);
-        Property property = modelMapper.map(existingBooking.getProperty(), Property.class);
+        Booking existingBooking = getBooking(id);
+        Property property = existingBooking.getProperty();
 
         if(existingBooking.getStatus().equals(BookingStatus.BOOKING_CANCELED.getName())){
             log.error("This booking is canceled and cannot be updated: {}", id);
@@ -80,7 +94,7 @@ public class BookingService {
             existingBooking.setLast_updated_at(LocalDateTime.now());
         }
 
-        bookingRepository.save(modelMapper.map(existingBooking,Booking.class));
+        bookingRepository.save(existingBooking);
         log.info("Booking successfully updated: {}", updatedBooking);
 
         return modelMapper.map(existingBooking,BookingDTO.class);
@@ -88,19 +102,21 @@ public class BookingService {
 
     public void cancelBooking(UUID id) {
         log.info("Attempting to cancel booking : {}", id);
-        BookingDTO existingBooking = getBooking(id);
+        Booking existingBooking = getBooking(id);
 
         existingBooking.setStatus(BookingStatus.BOOKING_CANCELED.getName());
         existingBooking.setLast_updated_at(LocalDateTime.now());
-        existingBooking.setProperty(modelMapper.map(existingBooking.getProperty(), PropertyDTO.class));
+        existingBooking.setProperty(existingBooking.getProperty());
 
-        bookingRepository.save(modelMapper.map(existingBooking, Booking.class));
+        bookingRepository.save(existingBooking);
         log.info("Booking successfully canceled: {}", id);
     }
 
+
+
     public void rebookCancelledBooking(UUID id) {
         log.info("Attempting to rebook booking : {}", id);
-        BookingDTO existingBookingToBeUpdated = getBooking(id);
+        Booking existingBookingToBeUpdated = getBooking(id);
 
         if(!existingBookingToBeUpdated.getStatus().equals(BookingStatus.BOOKING_CANCELED.getName())){
             log.error("The booking needs to be canceled first: {}", id);
@@ -108,24 +124,19 @@ public class BookingService {
         }
 
         existingBookingToBeUpdated.setStatus(BookingStatus.BOOKING_REBOOKED.getName());
-        bookingRepository.save(modelMapper.map(existingBookingToBeUpdated, Booking.class));
+        bookingRepository.save(existingBookingToBeUpdated);
     }
 
     public void deleteBooking(UUID id) {
-        BookingDTO existingBooking = getBooking(id);
-        bookingRepository.delete(modelMapper.map(existingBooking, Booking.class));
+        Booking existingBooking = getBooking(id);
+        bookingRepository.delete(existingBooking);
     }
 
-    public BookingDTO getBooking(UUID id) {
+    public Booking getBooking(UUID id) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + id));
 
-        BookingDTO bookingDTO = modelMapper.map(booking, BookingDTO.class);
-        bookingDTO.setGuestName(booking.getGuestName());
-        bookingDTO.setGuestLast4Ssn(booking.getGuestLast4Ssn());
-        bookingDTO.setProperty(modelMapper.map(booking.getProperty(), PropertyDTO.class));
-
-        return bookingDTO;
+        return booking;
     }
 }
 

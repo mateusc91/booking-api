@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Tag(name = "Blocks", description = "The blocks API")
 @RestController
-@RequestMapping("/blocks")
+@RequestMapping("/api/blocks")
 public class BlockController {
     private final BlockService blockService;
 
@@ -32,7 +32,7 @@ public class BlockController {
             @ApiResponse(responseCode = "400", description = "bad request"),
             @ApiResponse(responseCode = "404", description = "resource not found request")
     })
-    @PostMapping
+    @PostMapping("/create-block")
     public ResponseEntity<BlockDTO> createBlock(@Valid @RequestBody Block block) {
         BlockDTO createdBlock = blockService.createBlock(block);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBlock);
@@ -46,7 +46,7 @@ public class BlockController {
             @ApiResponse(responseCode = "400", description = "bad request"),
             @ApiResponse(responseCode = "404", description = "resource not found request")
     })
-    @PutMapping("/{id}")
+    @PutMapping("/update-block/{id}")
     public ResponseEntity<BlockDTO> updateBlock(@PathVariable UUID id,@Valid @RequestBody Block block) {
         BlockDTO updatedBlock = blockService.updateBlock(id, block);
         return ResponseEntity.status(HttpStatus.OK).body(updatedBlock);
@@ -60,7 +60,7 @@ public class BlockController {
             @ApiResponse(responseCode = "400", description = "bad request"),
             @ApiResponse(responseCode = "404", description = "resource not found request")
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete-block/{id}")
     public ResponseEntity<Void> deleteBlock(@PathVariable UUID id) {
         blockService.deleteBlock(id);
         return ResponseEntity.noContent().build();

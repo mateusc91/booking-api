@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Tag(name = "Bookings", description = "The bookings API")
 @RestController
-@RequestMapping("/bookings")
+@RequestMapping("/api/bookings")
 public class BookingController {
     private final BookingService bookingService;
 
@@ -36,7 +36,7 @@ public class BookingController {
             @ApiResponse(responseCode = "400", description = "bad request"),
             @ApiResponse(responseCode = "404", description = "resource not found request")
     })
-    @PostMapping
+    @PostMapping("/create-booking")
     public ResponseEntity<CreateBookingResponse> createBooking(@Valid @RequestBody CreateBookingRequest booking) {
         CreateBookingResponse createdBooking = bookingService.createBooking(booking);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBooking);
@@ -106,7 +106,7 @@ public class BookingController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<BookingDTO> getBooking(@PathVariable UUID id) {
-        BookingDTO booking = bookingService.getBooking(id);
+        BookingDTO booking = bookingService.getBookingById(id);
         return ResponseEntity.ok(booking);
     }
 }

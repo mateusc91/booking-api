@@ -25,6 +25,11 @@ public class PropertyAvailabilityValidator {
 
     public boolean validatePropertyAvailability(LocalDate startDate, LocalDate endDate, Property property) {
         boolean propertyAvailable = true;
+        if(startDate.isAfter(endDate)){
+            log.error("The startDate must be earlier than the endDate");
+            throw new IllegalArgumentException("The start date cannot be after the end date. Please check the dates entered");
+
+        }
         List<Booking> overlappingBookings = bookingRepository.findOverlappingBookingsForProperty(property, startDate, endDate);
         List<Block> blocks = blockRepository.findOverlappingBlocksForProperty(property,startDate,endDate);
         if(!overlappingBookings.isEmpty() || !blocks.isEmpty()){
@@ -37,6 +42,12 @@ public class PropertyAvailabilityValidator {
 
     public boolean validateBlockPropertyAvailability(LocalDate startDate, LocalDate endDate, Property property) {
         boolean propertyAvailable = true;
+
+        if(startDate.isAfter(endDate)){
+            log.error("The startDate must be earlier than the endDate");
+            throw new IllegalArgumentException("The start date cannot be after the end date. Please check the dates entered");
+
+        }
         List<Block> blocks = blockRepository.findOverlappingBlocksForProperty(property,startDate,endDate);
         if(!blocks.isEmpty()){
             propertyAvailable = false;

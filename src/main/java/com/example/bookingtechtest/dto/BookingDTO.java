@@ -1,5 +1,6 @@
 package com.example.bookingtechtest.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,11 +17,11 @@ import java.util.UUID;
 public class BookingDTO {
 
     private UUID id;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String startDate;
+    private String endDate;
     private String status;
-    private LocalDateTime created_at;
-    private LocalDateTime last_updated_at;
+    private String created_at;
+    private String last_updated_at;
     private String guestName;
     private String guestLast4Ssn;
     private PropertyDTO property;
